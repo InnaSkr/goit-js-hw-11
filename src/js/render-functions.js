@@ -1,56 +1,52 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import errorIcon from '../img/error.svg';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-export function galleryMarkup(data) {
-    const hits = data.data.hits;
-    const gallery = document.querySelector('.gallery');
+let lightbox = null;
 
-    if (hits.length === 0) {
-        iziToast.show({
-            messageColor: '#FAFAFB',
-            messageSize: '16px',
-            backgroundColor: '#EF4040',
-            iconUrl: errorIcon,
-            transitionIn: 'bounceInLeft',
-            position: 'topRight',
-            displayMode: 'replace',
-            closeOnClick: true,
-            message: 'Sorry, there are no images matching your search query. Please, try again!',
-        });
-        gallery.innerHTML = '';
+export function populateGallery(pixabays = []) {
+  const imagesContainer = document.querySelector('.gallery');
 
-        return;
-    }
+  imagesContainer.innerHTML = '';
 
-    const markup = hits
-        .map(
-            image =>
-                `<li class='gallery-item'>
-                    <a class='gallery-link' href="${image.largeImageURL}">
-                        <img class='gallery-img' src="${image.webformatURL}" alt="${image.tags}" />
-                        <div class="grid">
-                            <p>Likes</p>
-                            <p>Views</p>
-                            <p>Comment</p>
-                            <p>Downloads</p>
-                            <span>${image.likes}</span>
-                            <span>${image.views}</span>
-                            <span>${image.comments}</span>
-                            <span>${image.downloads}</span>
-                        </div>
-                    </a>
-                </li>`
-        )
-        .join(' ');
+  const galleryHTML = pixabays
+    .map(image => {
+      return `
+      <div class="card-container">
+        <div class="card">
+          <a href="${image.largeImageURL}">
+            <img class="card-image" src="${image.webformatURL}" alt="${image.tags}" />
+          </a>
+          <div class="card-body">
+            <div class="card-item">
+              <h4>Likes</h4><p>${image.likes}</p>
+            </div>
+            <div class="card-item">
+              <h4>Views</h4><p>${image.views}</p>
+            </div>
+            <div class="card-item">
+              <h4>Comments</h4><p>${image.comments}</p>
+            </div>
+            <div class="card-item">
+              <h4>Downloads</h4><p>${image.downloads}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    })
+    .join('');
 
-    gallery.innerHTML = markup;
+  imagesContainer.innerHTML = galleryHTML;
 
-    const lightbox = new SimpleLightbox('.gallery a', {
-        captionsData: 'alt',
-        captionDelay: 250,
-    });
+  if (!lightbox) {
+    lightbox = new SimpleLightbox('.gallery a');
+  } else {
     lightbox.refresh();
+  }
+}
+export function clearGallery() {
+  const imagesContainer = document.querySelector('.gallery');
+  imagesContainer.innerHTML = '';
 }
